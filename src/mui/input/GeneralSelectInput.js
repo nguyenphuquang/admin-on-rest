@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
-import title from 'admin-on-rest/util/title';
-import {SelectInput} from 'admin-on-rest/mui';
+import title from '../../util/title';
+import SelectInput from './SelectInput';
 import {MenuItem, SelectField} from 'material-ui';
 
 class GeneralSelectInput extends SelectInput {
