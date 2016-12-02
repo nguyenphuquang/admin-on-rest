@@ -7,3 +7,4 @@ export ReferenceInput from './ReferenceInput';
 export SelectInput from './SelectInput';
 export TextInput from './TextInput';
 export RichTextInput from './RichTextInput';
+export GeneralSelectInput from './GeneralSelectInput';
