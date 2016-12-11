@@ -10,68 +10,61 @@ import { getReferences, nameRelatedTo } from '../../reducer/references/oneToMany
  * You must define the fields to be passed to the iterator component as children.
  *
  * @example Display all the comments of the current post as a datagrid
- * <ReferenceManyField reference="comments" target="post_id">
+ * <ReferenceManyField target="post_id">
  *     <Datagrid>
  *         <TextField source="id" />
  *         <TextField source="body" />
  *         <DateField source="created_at" />
  *         <EditButton />
+ *         <DeleteButton />
  *     </Datagrid>
  * </ReferenceManyField>
  *
- * @example Display all the books by the current author, only the title
- * <ReferenceManyField reference="books" target="author_id">
- *     <SingleFieldList>
- *         <ChipField source="title" />
- *     </SingleFieldList>
- * </ReferenceManyField>
  */
-export class ReferenceManyField extends Component {
+export class ChildField extends Component {
     componentDidMount() {
-        const relatedTo = nameRelatedTo(this.props.reference, this.props.record.id, this.props.resource, this.props.target);
-        this.props.crudGetManyReference(this.props.reference, this.props.target, this.props.record.id, relatedTo);
+        //const relatedTo = nameRelatedTo(this.props.reference, this.props.record.id, this.props.resource, this.props.target);
+        //this.props.crudGetManyReference(this.props.reference, this.props.target, this.props.record.id, relatedTo);
     }
 
     componentWillReceiveProps(nextProps) {
-        if (this.props.record.id !== nextProps.record.id) {
-            const relatedTo = nameRelatedTo(nextProps.reference, nextProps.record.id, nextProps.resource, nextProps.target);
-            this.props.crudGetManyReference(nextProps.reference, nextProps.target, nextProps.record.id, relatedTo);
-        }
+        //if (this.props.record.id !== nextProps.record.id) {
+        //    const relatedTo = nameRelatedTo(nextProps.reference, nextProps.record.id, nextProps.resource, nextProps.target);
+        //    this.props.crudGetManyReference(nextProps.reference, nextProps.target, nextProps.record.id, relatedTo);
+        //relatedTo}
     }
 
     render() {
-        const { resource, reference, referenceRecords, children, basePath } = this.props;
+        const { resource, referenceRecords, children, basePath } = this.props;
         if (React.Children.count(children) !== 1) {
-            throw new Error('<ReferenceManyField> only accepts a single child (like <Datagrid>)');
+            throw new Error('<ChildField> only accepts a single child (like <Datagrid>)');
         }
         if (typeof referenceRecords === 'undefined') {
             return <LinearProgress style={{ marginTop: '1em' }} />;
         }
-        const referenceBasePath = basePath.replace(resource, reference); // FIXME obviously very weak
+        // const referenceBasePath = basePath.replace(resource, reference); // FIXME obviously very weak
         return React.cloneElement(children, {
-            resource: reference,
+            resource: "",
             ids: Object.keys(referenceRecords),
             data: referenceRecords,
-            basePath: referenceBasePath,
+            basePath: "",
             currentSort: {},
         });
     }
 }
 
-ReferenceManyField.propTypes = {
+ChildField.propTypes = {
     basePath: PropTypes.string.isRequired,
     children: PropTypes.element.isRequired,
-    crudGetManyReference: PropTypes.func.isRequired,
     includesLabel: PropTypes.bool,
     label: PropTypes.string,
     record: PropTypes.object,
-    reference: PropTypes.string.isRequired,
     referenceRecords: PropTypes.object,
     resource: PropTypes.string.isRequired,
-    source: PropTypes.string.isRequired,
     target: PropTypes.string.isRequired,
 };
 
+/*
 function mapStateToProps(state, props) {
     const relatedTo = nameRelatedTo(props.reference, props.record.id, props.resource, props.target);
     return {
@@ -79,13 +72,15 @@ function mapStateToProps(state, props) {
     };
 }
 
-const ConnectedReferenceManyField = connect(mapStateToProps, {
+const ConnectedChildField = connect(mapStateToProps, {
     crudGetManyReference: crudGetManyReferenceAction,
-})(ReferenceManyField);
+})(ChildField);
 
-ConnectedReferenceManyField.defaultProps = {
+ConnectedChildField.defaultProps = {
     includesLabel: false,
     source: '',
 };
 
-export default ConnectedReferenceManyField;
+export default ConnectedChildField;
+*/
+export default ChildField;

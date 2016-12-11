@@ -1,8 +1,11 @@
 import React, { Component, PropTypes } from 'react';
 import { TableHeaderColumn, TableRowColumn } from 'material-ui/Table';
 import FlatButton from 'material-ui/FlatButton';
-import ContentSort from 'material-ui/svg-icons/content/sort';
+import Dialog from 'material-ui/Dialog';
 import title from '../../util/title';
+import ChildRecordForm from '../detail/ChildRecordForm';
+
+import {reduxForm} from 'redux-form';
 
 const defaultStyles = {
     table: {
@@ -37,68 +40,138 @@ const defaultStyles = {
     },
 };
 
-class Datagrid extends Component {
-    updateSort = (event) => {
-        event.stopPropagation();
-        this.props.setSort(event.currentTarget.dataset.sort);
+
+class ChildDatagrid extends Component {
+
+    ChildRecordForm = null;
+
+    constructor(props) {
+        super(props);
+
+        this.ChildRecordForm = ChildRecordForm(props.source);
+
+        this.state = {
+            open: false,
+            confirm: false,
+        };
+    }
+
+    onDelete(item, id) {
+        this.setState({
+            confirm: true,
+            _currentId: id
+        });
+    }
+
+    onConfirmDelete() {
+        var id = this.state._currentId;
+        if (id!==null) {
+            var data = this.getData();
+            data.splice(id, 1);
+            this.props.input.onChange(data);
+            this.setState({
+                confirm: false,
+                _currentId: null,
+            })
+        }
+    }
+
+    onClick(item, id) {
+        this.setState({
+            _currentRecord: item,
+            _currentId: id,
+            open: true,
+        });
+    }
+
+    onSave(newData) {
+        // var data = this.props.data;
+        var data = this.getData();
+        var id = this.state._currentId;
+        if (id===null) {
+            data.push(newData);
+        } else {
+            data[id] = newData;
+        }
+        this.props.input.onChange(data);
+        this.setState({
+            open: false,
+            _currentRecord: null,
+            _currentId: null,
+        });
+    }
+
+    getData() {
+        const { input } = this.props;
+        return input.value || [];
     }
 
     render() {
-        const { resource, children, ids, data, currentSort, basePath, styles = defaultStyles, updateSort } = this.props;
+        const { list, edit, input, styles = defaultStyles } = this.props;
+        var listChildren = React.Children.toArray(list.props.children);
+        var data = this.getData();
         return (
-            <table style={styles.table}>
-                <thead>
-                    <tr style={styles.tr}>
-                        {React.Children.map(children, (field, index) => (
-                            <TableHeaderColumn key={field.props.source || index} style={index ? styles.th : styles['th:first-child']} >
-                                {(field.props.label || field.props.source) &&
-                                    <FlatButton
-                                        labelPosition="before"
-                                        onClick={this.updateSort}
-                                        data-sort={field.props.source}
-                                        label={title(field.props.label, field.props.source)}
-                                        icon={field.props.source === currentSort.sort ?
-                                            <ContentSort style={currentSort.order === 'ASC' ? { transform: 'rotate(180deg)' } : {}} /> : false
-                                        }
-                                        style={styles.sortButton}
-                                    />
-                                }
-                            </TableHeaderColumn>
-                        ))}
-                    </tr>
-                </thead>
-                <tbody style={styles.tbody}>
-                    {ids.map(id => (
-                        <tr style={styles.tr} key={id}>
-                            {React.Children.toArray(children).map((field, index) => (
-                                <TableRowColumn key={`${id}-${field.props.source || index}`} style={index ? styles.td : styles['td:first-child']} >
-                                    <field.type {...field.props} record={data[id]} basePath={basePath} resource={resource} />
-                                </TableRowColumn>
+            <div>
+                <table style={styles.table}>
+                    <thead>
+                        <tr style={styles.tr}>
+                            {listChildren.map((field, index) => (
+                                <TableHeaderColumn key={field.props.source || index} style={index ? styles.th : styles['th:first-child']} >
+                                    {field.props.label || field.props.source}
+                                </TableHeaderColumn>
                             ))}
+                            <TableRowColumn key={`add--1`} style={styles.td} >
+                                <FlatButton primary label="Add" onClick={this.onClick.bind(this, {}, null)} />
+                            </TableRowColumn>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody style={styles.tbody}>
+                        {data.map((row, id) => (
+                            <tr style={styles.tr} key={id}>
+                                {listChildren.map((field, index) => {
+                                    return <TableRowColumn key={`${id}-${field.props.source || index}`} style={index ? styles.td : styles['td:first-child']} >
+                                        <field.type {...field.props} record={data[id]} />
+                                    </TableRowColumn>
+                                })}
+                                <TableRowColumn key={`${id}--1`} style={styles.td} >
+                                    <FlatButton primary label="Edit" onClick={this.onClick.bind(this, row, id)} />
+                                    <FlatButton primary label="Delete" onClick={this.onDelete.bind(this, row, id)} />
+                                </TableRowColumn>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+                {this.state.open?(
+                    <Dialog open={this.state.open} title="Edit record"
+                            onRequestClose={() => {this.setState({open: false})}} >
+                        <this.ChildRecordForm
+                            onSubmit={this.onSave.bind(this)}
+                            record={this.state._currentRecord}
+                            initialValues={this.state._currentRecord}
+                            resource={this.props.resource}
+                            >
+                            {edit.props.children}
+                        </this.ChildRecordForm>
+                    </Dialog>
+                ):null}
+                <Dialog open={this.state.confirm} title="Delete this record?"
+                        actions={[
+                            <FlatButton primary label="Yes" onClick={this.onConfirmDelete.bind(this)} />,
+                            <FlatButton primary label="No" onClick={() => {this.setState({confirm: false})}} />
+                        ]} />
+            </div>
         );
     }
 }
 
-Datagrid.propTypes = {
-    ids: PropTypes.arrayOf(PropTypes.any).isRequired,
-    resource: PropTypes.string,
-    data: PropTypes.object.isRequired,
-    currentSort: PropTypes.shape({
-        sort: PropTypes.string,
-        order: PropTypes.string,
-    }),
-    basePath: PropTypes.string,
-    setSort: PropTypes.func,
+/*
+ */
+
+ChildDatagrid.propTypes = {
     styles: PropTypes.object,
 };
 
-Datagrid.defaultProps = {
-    data: {},
-    ids: [],
+ChildDatagrid.defaultProps = {
 };
 
-export default Datagrid;
+export default ChildDatagrid;

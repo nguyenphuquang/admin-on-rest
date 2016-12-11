@@ -5,3 +5,6 @@ export FilterForm from './FilterForm';
 export List from './List';
 export Pagination from './Pagination';
 export SingleFieldList from './SingleFieldList';
+
+// quang's
+export ChildDatagrid from './ChildDatagrid';

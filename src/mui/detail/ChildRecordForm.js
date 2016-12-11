@@ -63,7 +63,7 @@ export const RecordForm = ({ children, handleSubmit, record, resource, basePath 
                             resource={resource}
                             record={record}
                             basePath={basePath}
-                        />
+                            />
                         :
                         <Field
                             {...input.props}
@@ -73,7 +73,7 @@ export const RecordForm = ({ children, handleSubmit, record, resource, basePath 
                             resource={resource}
                             record={record}
                             basePath={basePath}
-                        >{ input }</Field>
+                            >{ input }</Field>
                     }
                 </div>
             ))}
@@ -94,7 +94,7 @@ RecordForm.propTypes = {
     basePath: PropTypes.string,
 };
 
-export default reduxForm({
-    form: 'record-form',
+export default (formName) => reduxForm({
+    form: 'record-form-' + formName,
     validate: validateForm,
 })(RecordForm);

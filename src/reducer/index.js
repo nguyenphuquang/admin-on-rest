@@ -7,7 +7,7 @@ import references from './references';
 export default (resources) => {
     const resourceReducers = {};
     resources.forEach(resource => {
-        resourceReducers[resource.name] = resourceReducer(resource.name, resource.options);
+        resourceReducers[resource.name] = resourceReducer(resource.name, resource.options, resource);
     });
     return combineReducers({
         ...resourceReducers,

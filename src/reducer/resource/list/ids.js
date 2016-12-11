@@ -1,12 +1,19 @@
 import { CRUD_GET_LIST_SUCCESS, CRUD_DELETE_SUCCESS } from '../../../actions/dataActions';
 
-export default resource => (previousState = [], { type, payload, requestPayload, meta }) => {
+export default (resource, res) => (previousState = [], { type, payload, requestPayload, meta }) => {
     if (!meta || meta.resource !== resource) {
         return previousState;
     }
     switch (type) {
     case CRUD_GET_LIST_SUCCESS:
-        return payload.data.map(record => record.id);
+        //if (res && res.customId) {
+        //    return payload.data.map(record => {
+        //        debugger;
+        //        return record.id = record[res.customId]
+        //    });
+        //} else {
+            return payload.data.map(record => record.id);
+        //}
     case CRUD_DELETE_SUCCESS: {
         const index = previousState.findIndex(el => el == requestPayload.id); // eslint-disable-line eqeqeq
         if (index === -1) {
