@@ -27,27 +27,6 @@ export class List extends Component {
         this.updateData();
     }
     
-    componentDidUpdate() {
-        /*
-        console.log('=========query1', JSON.stringify(this.props.formFilter));
-        console.log('=========query2', JSON.stringify(this.props.filters));
-        console.log('=========query3', JSON.stringify(this.props.query.filter));
-        */
-        
-        if (JSON.stringify(this.props.query.filter) != JSON.stringify(this.props.filters)) {
-            var filters = this.props.query.filter || {};
-            var _filters = this.props.filters || {};
-            var change = this.props.changeFormValue;
-            setTimeout(function() {
-                for (let key in filters) {
-                    if (_filters[key] !== filters[key]) {
-                        change(filterFormName, key, filters[key] || null);
-                    }
-                }
-            }, 500);
-        }
-    }
-
     componentWillReceiveProps(nextProps) {
         if (nextProps.resource !== this.props.resource
          || nextProps.query.sort !== this.props.query.sort
@@ -92,6 +71,7 @@ export class List extends Component {
     }
 
     getQuery() {
+        console.log('=====getQuery', this.props.query);
         return (Object.keys(this.props.query).length > 0) ? this.props.query : { ...this.props.params };
     }
 
