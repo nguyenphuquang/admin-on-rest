@@ -26,6 +26,27 @@ export class List extends Component {
     componentDidMount() {
         this.updateData();
     }
+    
+    componentDidUpdate() {
+        /*
+        console.log('=========query1', JSON.stringify(this.props.formFilter));
+        console.log('=========query2', JSON.stringify(this.props.filters));
+        console.log('=========query3', JSON.stringify(this.props.query.filter));
+        */
+        
+        if (JSON.stringify(this.props.query.filter) != JSON.stringify(this.props.filters)) {
+            var filters = this.props.query.filter || {};
+            var _filters = this.props.filters || {};
+            var change = this.props.changeFormValue;
+            setTimeout(function() {
+                for (let key in filters) {
+                    if (_filters[key] !== filters[key]) {
+                        change(filterFormName, key, filters[key] || null);
+                    }
+                }
+            }, 500);
+        }
+    }
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.resource !== this.props.resource
@@ -83,7 +104,9 @@ export class List extends Component {
 
     setPage = page => this.changeParams({ type: SET_PAGE, payload: page });
 
-    setFilters = filters => this.changeParams({ type: SET_FILTER, payload: filters });
+    setFilters = filters => {
+        this.changeParams({ type: SET_FILTER, payload: filters });
+    }
 
     showFilter = filterName => this.setState({ [filterName]: true });
 

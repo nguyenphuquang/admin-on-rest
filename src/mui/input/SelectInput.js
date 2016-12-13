@@ -30,8 +30,19 @@ import MenuItem from 'material-ui/MenuItem';
 class SelectInput extends Component {
     onChange = (e, _, value) => this.props.input.onChange(value);
 
+    constructor(props) {
+        super(props);
+    }
+
     render() {
         const { allowEmpty, input, label, choices, optionText, optionValue, options, source, style } = this.props;
+        // const {allowEmpty, input, choices, optionValue} = props;
+        if (!allowEmpty) {
+            if (choices && choices.length > 0 && (input.value==='' || typeof input.value === 'undefined')) {
+                input.value = choices[0][optionValue];
+            }
+        }
+
         return (
             <SelectField
                 menuStyle={{ maxHeight: '41px', overflowY: 'hidden' }}
@@ -73,6 +84,7 @@ SelectInput.defaultProps = {
     optionText: 'name',
     optionValue: 'id',
     includesLabel: true,
+    meta: {}
 };
 
 export default SelectInput;

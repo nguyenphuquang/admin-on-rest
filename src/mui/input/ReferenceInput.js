@@ -27,9 +27,16 @@ export class ReferenceInput extends Component {
     }
 
     render() {
-        const { input, resource, label, source, record, referenceRecord, allowEmpty, matchingReferences, basePath, onChange, children } = this.props;
+        const { input, resource, label, source, record, referenceRecord, allowEmpty,
+                matchingReferences, basePath, onChange, children, isNew } = this.props;
         if (!referenceRecord && !allowEmpty) {
-            return <Labeled label={label} source={source} />;
+            if (!isNew) {
+                return <Labeled label={label} source={source}/>;
+            } else {
+                if (!matchingReferences) {
+                    return <span/>;
+                }
+            }
         }
 
         return React.cloneElement(children, {
@@ -62,6 +69,7 @@ ReferenceInput.propTypes = {
     referenceRecord: PropTypes.object,
     resource: PropTypes.string.isRequired,
     source: PropTypes.string.isRequired,
+    isNew: PropTypes.bool,
 };
 
 ReferenceInput.defaultProps = {
