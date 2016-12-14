@@ -8,7 +8,7 @@ export class FilterForm extends Component {
     getShownFilters() {
         const { filters, displayedFilters, currentFilters, initialValues } = this.props;
         return filters
-            .filter(filterElement =>
+            .filter(filterElement => (
                 filterElement.props.alwaysOn ||
                 displayedFilters[filterElement.props.source] ||
                 currentFilters[filterElement.props.source] ||
@@ -19,11 +19,11 @@ export class FilterForm extends Component {
     handleHide = (event) => this.props.hideFilter(event.currentTarget.dataset.key);
 
     render() {
-        const { currentFilters, resource } = this.props;
+        const { currentFilters, resource, style } = this.props;
         return (<div>
-            <CardText style={{ float: 'right', marginTop: '-14px', paddingTop: 0 }}>
+            <CardText style={{ float: 'right', marginTop: '-14px', paddingTop: 0, ...style }}>
                 {this.getShownFilters().map(filterElement =>
-                    <div key={filterElement.props.source}>
+                    <div key={filterElement.props.source} style={filterElement.props.style}>
                         {filterElement.props.alwaysOn ?
                             <div style={{ width: 48, display: 'inline-block' }}>&nbsp;</div> :
                             <IconButton iconStyle={{ color: '#00bcd4' }} onTouchTap={this.handleHide} data-key={filterElement.props.source} tooltip="Remove this filter">

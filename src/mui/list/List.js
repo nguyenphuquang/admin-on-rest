@@ -71,7 +71,6 @@ export class List extends Component {
     }
 
     getQuery() {
-        console.log('=====getQuery', this.props.query);
         return (Object.keys(this.props.query).length > 0) ? this.props.query : { ...this.props.params };
     }
 

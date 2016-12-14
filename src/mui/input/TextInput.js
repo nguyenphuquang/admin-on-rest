@@ -25,7 +25,7 @@ TextInput.propTypes = {
     source: PropTypes.string.isRequired,
     style: PropTypes.object,
     type: PropTypes.string,
-    validation: PropTypes.object,
+    validation: PropTypes.oneOfType([PropTypes.object, PropTypes.func])
 };
 
 TextInput.defaultProps = {
