@@ -26,7 +26,7 @@ export class List extends Component {
     componentDidMount() {
         this.updateData();
     }
-    
+
     componentWillReceiveProps(nextProps) {
         if (nextProps.resource !== this.props.resource
          || nextProps.query.sort !== this.props.query.sort
@@ -190,6 +190,13 @@ function mapStateToProps(state, props) {
     };
 }
 
+function mergeProps(stateProps, dispatchProps, ownProps) {
+    if (ownProps.crudGetList) {
+        dispatchProps.crudGetList = ownProps.crudGetList;
+    }
+    return Object.assign({}, ownProps, stateProps, dispatchProps);
+}
+
 export default connect(
     mapStateToProps,
     {
@@ -198,4 +205,5 @@ export default connect(
         changeListParams: changeListParamsAction,
         push: pushAction,
     },
+    mergeProps
 )(List);

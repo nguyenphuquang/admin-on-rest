@@ -13,7 +13,7 @@ export class FilterForm extends Component {
                 displayedFilters[filterElement.props.source] ||
                 currentFilters[filterElement.props.source] ||
                 initialValues[filterElement.props.source]
-            );
+            ));
     }
 
     handleHide = (event) => this.props.hideFilter(event.currentTarget.dataset.key);

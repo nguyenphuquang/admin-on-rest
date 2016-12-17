@@ -6,14 +6,7 @@ export default (resource, res) => (previousState = [], { type, payload, requestP
     }
     switch (type) {
     case CRUD_GET_LIST_SUCCESS:
-        //if (res && res.customId) {
-        //    return payload.data.map(record => {
-        //        debugger;
-        //        return record.id = record[res.customId]
-        //    });
-        //} else {
-            return payload.data.map(record => record.id);
-        //}
+        return payload.data.map(record => record.id);
     case CRUD_DELETE_SUCCESS: {
         const index = previousState.findIndex(el => el == requestPayload.id); // eslint-disable-line eqeqeq
         if (index === -1) {
