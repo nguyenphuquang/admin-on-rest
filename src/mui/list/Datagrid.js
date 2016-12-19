@@ -74,7 +74,7 @@ class Datagrid extends Component {
                         <tr style={styles.tr} key={id}>
                             {React.Children.toArray(children).map((field, index) => (
                                 <TableRowColumn key={`${id}-${field.props.source || index}`} style={
-                                        Object.assign({}, index ? styles.td : styles['td:first-child'], {textAlign: field.props.align || 'center'})
+                                        Object.assign({}, index ? styles.td : styles['td:first-child'], {textAlign: field.props.align || 'left'})
                                     } >
                                     <field.type {...field.props} record={data[id]} basePath={basePath} resource={resource} />
                                 </TableRowColumn>
