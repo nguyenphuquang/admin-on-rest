@@ -179,7 +179,7 @@ function mapStateToProps(state, props) {
         query.filter = props.filter ? JSON.parse(query.filter) : resourceState.list.params.filter;
     }
 
-    return {
+    var ret = {
         query,
         params: resourceState.list.params,
         ids: resourceState.list.ids,
@@ -188,6 +188,12 @@ function mapStateToProps(state, props) {
         isLoading: state.admin.loading > 0,
         filters: props.filter ? getFormValues(filterFormName)(state) : resourceState.list.params.filter,
     };
+
+    // quang's add middleware for resource
+    if (props.middleware && props.middleware.mapStateToProps) {
+        ret = props.middleware.mapStateToProps(ret, state, props, 'list');
+    }
+    return ret;
 }
 
 function mergeProps(stateProps, dispatchProps, ownProps) {
