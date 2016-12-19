@@ -50,7 +50,9 @@ class Datagrid extends Component {
                 <thead>
                     <tr style={styles.tr}>
                         {React.Children.map(children, (field, index) => (
-                            <TableHeaderColumn key={field.props.source || index} style={index ? styles.th : styles['th:first-child']} >
+                            <TableHeaderColumn key={field.props.source || index} style={
+                                    Object.assign({}, index ? styles.th : styles['th:first-child'], {textAlign: field.props.align || 'left'})
+                                } >
                                 {(field.props.label || field.props.source) &&
                                     <FlatButton
                                         labelPosition="before"
@@ -71,7 +73,9 @@ class Datagrid extends Component {
                     {ids.map(id => (
                         <tr style={styles.tr} key={id}>
                             {React.Children.toArray(children).map((field, index) => (
-                                <TableRowColumn key={`${id}-${field.props.source || index}`} style={index ? styles.td : styles['td:first-child']} >
+                                <TableRowColumn key={`${id}-${field.props.source || index}`} style={
+                                        Object.assign({}, index ? styles.td : styles['td:first-child'], {textAlign: field.props.align || 'center'})
+                                    } >
                                     <field.type {...field.props} record={data[id]} basePath={basePath} resource={resource} />
                                 </TableRowColumn>
                             ))}
