@@ -190,8 +190,9 @@ function mapStateToProps(state, props) {
     };
 
     // quang's add middleware for resource
-    if (props.middleware && props.middleware.mapStateToProps) {
-        ret = props.middleware.mapStateToProps(ret, state, props, 'list');
+    const {middleware} = props.route;
+    if (middleware && middleware.mapStateToProps) {
+        ret = middleware.mapStateToProps(ret, state, props, 'list');
     }
     return ret;
 }

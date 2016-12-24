@@ -50,8 +50,9 @@ export const validateForm = (values, { children, validation }) => {
     return errors;
 };
 
-export const RecordForm = ({ children, handleSubmit, record, resource, basePath }) => (
+export const RecordForm = ({ children, handleSubmit, record, resource, basePath, buttons=[<SaveButton />], content=null }) => (
     <form onSubmit={handleSubmit}>
+        {content?<div style={{ padding: '0 1em 1em 1em' }}>{content}</div>:null}
         <div style={{ padding: '0 1em 1em 1em' }}>
             {React.Children.map(children, input => (
                 <div key={input.props.source}>
@@ -80,7 +81,7 @@ export const RecordForm = ({ children, handleSubmit, record, resource, basePath 
         </div>
         <Toolbar>
             <ToolbarGroup>
-                <SaveButton />
+                {buttons}
             </ToolbarGroup>
         </Toolbar>
     </form>
