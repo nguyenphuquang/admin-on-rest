@@ -85,6 +85,9 @@ class ChildDatagrid extends Component {
     }
 
     onSave(newData) {
+        if (this.props.onChangeRow) {
+            this.props.onChangeRow(newData);
+        }
         // var data = this.props.data;
         var data = this.getData();
         var id = this.state._currentId;

@@ -4,6 +4,8 @@ import { Toolbar, ToolbarGroup } from 'material-ui/Toolbar';
 import { getConstraintsFunctionFromFunctionOrObject } from '../../util/validate';
 import { SaveButton } from '../button';
 import Labeled from '../input/Labeled';
+import get from 'lodash.get';
+import set from 'lodash.set';
 
 /**
  * @example
@@ -39,12 +41,18 @@ export const validateForm = (values, { children, validation }) => {
 
     const fieldConstraints = getFieldConstraints(children);
     Object.keys(fieldConstraints).forEach(fieldName => {
-        const error = fieldConstraints[fieldName](values[fieldName], values);
+        const error = fieldConstraints[fieldName](get(values, fieldName), values);
         if (error.length > 0) {
+            /*
             if (!errors[fieldName]) {
                 errors[fieldName] = [];
             }
             errors[fieldName] = [...errors[fieldName], ...error];
+            */
+            if (!get(errors, fieldName)) {
+                set(errors, fieldName, []);
+            }
+            set(errors, fieldName, [...get(errors, fieldName), ...error]);
         }
     });
     return errors;
