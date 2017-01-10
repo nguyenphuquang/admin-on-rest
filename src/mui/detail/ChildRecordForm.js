@@ -58,7 +58,7 @@ export const validateForm = (values, { children, validation }) => {
     return errors;
 };
 
-export const RecordForm = ({ children, handleSubmit, record, resource, basePath, buttons=[<SaveButton />], content=null }) => (
+export const RecordForm = ({ children, handleSubmit, record, resource, basePath, buttons=[<SaveButton key="save" />], content=null }) => (
     <form onSubmit={handleSubmit}>
         {content?<div style={{ padding: '0 1em 1em 1em' }}>{content}</div>:null}
         <div style={{ padding: '0 1em 1em 1em' }}>
