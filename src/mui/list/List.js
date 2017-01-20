@@ -128,14 +128,16 @@ export class List extends Component {
                     displayedFilters: this.state,
                     context: 'form',
                 })}
-                {React.cloneElement(children, {
-                    resource,
-                    ids,
-                    data,
-                    currentSort: query,
-                    basePath,
-                    setSort: this.setSort,
-                })}
+                <div style={{overflowX: 'scroll', width: '100%'}}>
+                    {React.cloneElement(children, {
+                        resource,
+                        ids,
+                        data,
+                        currentSort: query,
+                        basePath,
+                        setSort: this.setSort,
+                    })}
+                </div>
                 <Pagination resource={resource} page={parseInt(query.page, 10)} perPage={parseInt(query.perPage, 10)} total={total} setPage={this.setPage} />
                 {this.props.footer || null}
             </Card>
