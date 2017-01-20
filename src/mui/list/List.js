@@ -119,7 +119,8 @@ export class List extends Component {
                     {hasCreate && <CreateButton basePath={basePath} />}
                     <FlatButton primary label="Refresh" onClick={this.refresh} icon={<NavigationRefresh />} />
                 </CardActions>
-                <CardTitle title={<Title title={title} defaultTitle={`${inflection.humanize(inflection.pluralize(resource))} List`} />} />
+                {this.props.header || null}
+                <CardTitle title={this.props.titleComponent || <Title title={title} defaultTitle={`${inflection.humanize(inflection.pluralize(resource))} List`} />} />
                 {filter && React.createElement(filter, {
                     resource,
                     hideFilter: this.hideFilter,
@@ -136,6 +137,7 @@ export class List extends Component {
                     setSort: this.setSort,
                 })}
                 <Pagination resource={resource} page={parseInt(query.page, 10)} perPage={parseInt(query.perPage, 10)} total={total} setPage={this.setPage} />
+                {this.props.footer || null}
             </Card>
         );
     }
