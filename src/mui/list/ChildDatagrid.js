@@ -111,7 +111,7 @@ const ChildDatagrid = withRouter(
         }
 
         render() {
-            var { list, edit, input, styles = defaultStyles } = this.props;
+            var { list, edit, input, canEdit = true, canDelete = true, canAdd = true, styles = defaultStyles } = this.props;
             if (typeof list == 'function') {
                 list = list(this.props);
             }
@@ -130,9 +130,9 @@ const ChildDatagrid = withRouter(
                                         {field.props.label || field.props.source}
                                     </TableHeaderColumn>
                                 ))}
-                                <TableRowColumn key={`add--1`} style={styles.td} >
+                                {canAdd && <TableRowColumn key={`add--1`} style={styles.td} >
                                     <FlatButton primary label="Add" onClick={this.onClick.bind(this, {}, null)} />
-                                </TableRowColumn>
+                                </TableRowColumn>}
                             </tr>
                         </thead>
                         <tbody style={styles.tbody}>
@@ -144,8 +144,8 @@ const ChildDatagrid = withRouter(
                                         </TableRowColumn>
                                     })}
                                     <TableRowColumn key={`${id}--1`} style={styles.td} >
-                                        <FlatButton primary label="Edit" onClick={this.onClick.bind(this, row, id)} />
-                                        <FlatButton primary label="Delete" onClick={this.onDelete.bind(this, row, id)} />
+                                        {canEdit && <FlatButton primary label="Edit" onClick={this.onClick.bind(this, row, id)} />}
+                                        {canDelete && <FlatButton primary label="Delete" onClick={this.onDelete.bind(this, row, id)} />}
                                     </TableRowColumn>
                                 </tr>
                             ))}
