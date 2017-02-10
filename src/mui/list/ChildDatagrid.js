@@ -6,6 +6,7 @@ import title from '../../util/title';
 import ChildRecordForm from '../detail/ChildRecordForm';
 
 import {reduxForm} from 'redux-form';
+import {withRouter} from 'react-router';
 
 const defaultStyles = {
     table: {
@@ -40,132 +41,139 @@ const defaultStyles = {
     },
 };
 
+const ChildDatagrid = withRouter(
+    class _ChildDatagrid extends Component {
 
-class ChildDatagrid extends Component {
+        ChildRecordForm = null;
 
-    ChildRecordForm = null;
+        constructor(props) {
+            super(props);
 
-    constructor(props) {
-        super(props);
+            this.ChildRecordForm = ChildRecordForm(props.source);
 
-        this.ChildRecordForm = ChildRecordForm(props.source);
+            this.state = {
+                open: false,
+                confirm: false,
+            };
+        }
 
-        this.state = {
-            open: false,
-            confirm: false,
-        };
-    }
+        onDelete(item, id) {
+            this.setState({
+                confirm: true,
+                _currentId: id
+            });
+        }
 
-    onDelete(item, id) {
-        this.setState({
-            confirm: true,
-            _currentId: id
-        });
-    }
+        onConfirmDelete() {
+            var id = this.state._currentId;
+            if (id!==null) {
+                var data = this.getData();
+                data.splice(id, 1);
+                this.props.input.onChange(data);
+                this.setState({
+                    confirm: false,
+                    _currentId: null,
+                })
+            }
+        }
 
-    onConfirmDelete() {
-        var id = this.state._currentId;
-        if (id!==null) {
+        onClick(item, id) {
+            this.setState({
+                _currentRecord: item,
+                _currentId: id,
+                open: true,
+            });
+        }
+
+        onSave(newData) {
+            if (this.props.onChangeRow) {
+                this.props.onChangeRow(newData);
+            }
+            // var data = this.props.data;
             var data = this.getData();
-            data.splice(id, 1);
+            var id = this.state._currentId;
+            if (id===null) {
+                data.push(newData);
+            } else {
+                data[id] = newData;
+            }
             this.props.input.onChange(data);
             this.setState({
-                confirm: false,
+                open: false,
+                _currentRecord: null,
                 _currentId: null,
-            })
+            });
         }
-    }
 
-    onClick(item, id) {
-        this.setState({
-            _currentRecord: item,
-            _currentId: id,
-            open: true,
-        });
-    }
-
-    onSave(newData) {
-        if (this.props.onChangeRow) {
-            this.props.onChangeRow(newData);
+        getData() {
+            const { input } = this.props;
+            return input.value || [];
         }
-        // var data = this.props.data;
-        var data = this.getData();
-        var id = this.state._currentId;
-        if (id===null) {
-            data.push(newData);
-        } else {
-            data[id] = newData;
-        }
-        this.props.input.onChange(data);
-        this.setState({
-            open: false,
-            _currentRecord: null,
-            _currentId: null,
-        });
-    }
 
-    getData() {
-        const { input } = this.props;
-        return input.value || [];
-    }
-
-    render() {
-        const { list, edit, input, styles = defaultStyles } = this.props;
-        var listChildren = React.Children.toArray(list.props.children);
-        var data = this.getData();
-        return (
-            <div>
-                <table style={styles.table}>
-                    <thead>
-                        <tr style={styles.tr}>
-                            {listChildren.map((field, index) => (
-                                <TableHeaderColumn key={field.props.source || index} style={index ? styles.th : styles['th:first-child']} >
-                                    {field.props.label || field.props.source}
-                                </TableHeaderColumn>
-                            ))}
-                            <TableRowColumn key={`add--1`} style={styles.td} >
-                                <FlatButton primary label="Add" onClick={this.onClick.bind(this, {}, null)} />
-                            </TableRowColumn>
-                        </tr>
-                    </thead>
-                    <tbody style={styles.tbody}>
-                        {data.map((row, id) => (
-                            <tr style={styles.tr} key={id}>
-                                {listChildren.map((field, index) => {
-                                    return <TableRowColumn key={`${id}-${field.props.source || index}`} style={index ? styles.td : styles['td:first-child']} >
-                                        <field.type {...field.props} record={data[id]} />
-                                    </TableRowColumn>
-                                })}
-                                <TableRowColumn key={`${id}--1`} style={styles.td} >
-                                    <FlatButton primary label="Edit" onClick={this.onClick.bind(this, row, id)} />
-                                    <FlatButton primary label="Delete" onClick={this.onDelete.bind(this, row, id)} />
+        render() {
+            var { list, edit, input, styles = defaultStyles } = this.props;
+            if (typeof list == 'function') {
+                list = list(this.props);
+            }
+            if (typeof edit == 'function') {
+                edit = edit(this.props);
+            }
+            var listChildren = React.Children.toArray(list.props.children);
+            var data = this.getData();
+            return (
+                <div>
+                    <table style={styles.table}>
+                        <thead>
+                            <tr style={styles.tr}>
+                                {listChildren.map((field, index) => (
+                                    <TableHeaderColumn key={field.props.source || index} style={index ? styles.th : styles['th:first-child']} >
+                                        {field.props.label || field.props.source}
+                                    </TableHeaderColumn>
+                                ))}
+                                <TableRowColumn key={`add--1`} style={styles.td} >
+                                    <FlatButton primary label="Add" onClick={this.onClick.bind(this, {}, null)} />
                                 </TableRowColumn>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-                {this.state.open?(
-                    <Dialog open={this.state.open} title="Edit record"
-                            onRequestClose={() => {this.setState({open: false})}} >
-                        <this.ChildRecordForm
-                            onSubmit={this.onSave.bind(this)}
-                            record={this.state._currentRecord}
-                            initialValues={this.state._currentRecord}
-                            resource={this.props.resource}
-                            >
-                            {edit.props.children}
-                        </this.ChildRecordForm>
-                    </Dialog>
-                ):null}
-                <Dialog open={this.state.confirm} title="Delete this record?"
-                        actions={[
-                            <FlatButton primary label="Yes" onClick={this.onConfirmDelete.bind(this)} />,
-                            <FlatButton primary label="No" onClick={() => {this.setState({confirm: false})}} />
-                        ]} />
-            </div>
-        );
+                        </thead>
+                        <tbody style={styles.tbody}>
+                            {data.map((row, id) => (
+                                <tr style={styles.tr} key={id}>
+                                    {listChildren.map((field, index) => {
+                                        return <TableRowColumn key={`${id}-${field.props.source || index}`} style={index ? styles.td : styles['td:first-child']} >
+                                            <field.type {...field.props} record={data[id]} />
+                                        </TableRowColumn>
+                                    })}
+                                    <TableRowColumn key={`${id}--1`} style={styles.td} >
+                                        <FlatButton primary label="Edit" onClick={this.onClick.bind(this, row, id)} />
+                                        <FlatButton primary label="Delete" onClick={this.onDelete.bind(this, row, id)} />
+                                    </TableRowColumn>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                    {this.state.open?(
+                        <Dialog open={this.state.open} title="Edit record"
+                                onRequestClose={() => {this.setState({open: false})}} >
+                            <this.ChildRecordForm
+                                onSubmit={this.onSave.bind(this)}
+                                record={this.state._currentRecord}
+                                initialValues={this.state._currentRecord}
+                                resource={this.props.resource}
+                                >
+                                {edit.props.children}
+                            </this.ChildRecordForm>
+                        </Dialog>
+                    ):null}
+                    <Dialog open={this.state.confirm} title="Delete this record?"
+                            actions={[
+                                <FlatButton primary label="Yes" onClick={this.onConfirmDelete.bind(this)} />,
+                                <FlatButton primary label="No" onClick={() => {this.setState({confirm: false})}} />
+                            ]} />
+                </div>
+            );
+        }
     }
-}
+);
 
 /*
  */
