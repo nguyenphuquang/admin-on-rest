@@ -54,7 +54,7 @@ export class List extends Component {
     constructor(props) {
         super(props);
         this.debouncedSetFilters = debounce(this.setFilters.bind(this), 500);
-        this.state = { key: 0 };
+        this.state = {};
     }
 
     componentDidMount() {
@@ -71,10 +71,6 @@ export class List extends Component {
          || nextProps.query.page !== this.props.query.page
          || nextProps.query.filter !== this.props.query.filter) {
             this.updateData(Object.keys(nextProps.query).length > 0 ? nextProps.query : nextProps.params);
-        }
-        if (nextProps.data !== this.props.data && this.fullRefresh) {
-            this.fullRefresh = false;
-            this.setState({ key: this.state.key + 1 });
         }
         if (Object.keys(nextProps.filters).length === 0 && Object.keys(this.props.filters).length === 0) {
             return;
@@ -108,7 +104,6 @@ export class List extends Component {
 
     refresh = (event) => {
         event.stopPropagation();
-        this.fullRefresh = true;
         this.updateData();
     }
 
@@ -160,12 +155,11 @@ export class List extends Component {
 
     render() {
         const { filter, pagination = <DefaultPagination />, actions = <DefaultActions />, resource, hasCreate, title, data, ids, total, children, isLoading } = this.props;
-        const { key } = this.state;
         const query = this.getQuery();
         const filterValues = query.filter;
         const basePath = this.getBasePath();
         return (
-            <Card style={{ margin: '2em', opacity: isLoading ? 0.8 : 1 }} key={key}>
+            <Card style={{ margin: '2em', opacity: isLoading ? 0.8 : 1 }}>
                 {actions && React.cloneElement(actions, {
                     resource,
                     filter,
@@ -177,7 +171,7 @@ export class List extends Component {
                     refresh: this.refresh,
                 })}
                 {this.props.header || null}
-                <CardTitle title={this.props.titleComponent || <Title title={title} defaultTitle={`${inflection.humanize(inflection.pluralize(resource))} List`} />} />
+                <CardTitle title={<Title title={this.props.titleComponent || title} defaultTitle={`${inflection.humanize(inflection.pluralize(resource))} List`} />} />
                 {filter && React.cloneElement(filter, {
                     resource,
                     hideFilter: this.hideFilter,

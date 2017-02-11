@@ -57,17 +57,18 @@ class SelectInput extends Component {
 
     render() {
         const { allowEmpty, input, label, choices, optionText, optionValue, options, source, elStyle } = this.props;
-        if (!allowEmpty) {
-            if (choices && choices.length > 0 && (input.value==='' || typeof input.value === 'undefined')) {
-                input.value = choices[0][optionValue];
-            }
-        }
         const option = React.isValidElement(optionText) ? // eslint-disable-line no-nested-ternary
             choice => React.cloneElement(optionText, { record: choice }) :
             (typeof optionText === 'function' ?
                 optionText :
                 choice => choice[optionText]
             );
+        if (!allowEmpty) {
+            if (choices && choices.length > 0 && (input.value==='' || typeof input.value === 'undefined')) {
+                input.value = choices[0][optionValue];
+            }
+        }
+
         return (
             <SelectField
                 {...input}
