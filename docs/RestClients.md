@@ -7,6 +7,8 @@ title: "REST Clients"
 
 Admin-on-rest can communicate with any REST server, regardless of the REST dialect it uses. Whether it's [JSON API](http://jsonapi.org/), [HAL](http://stateless.co/hal_specification.html), [OData](http://www.odata.org/) or a custom dialect, the only thing admin-on-rest needs is a REST client function. This is the place to translate REST requests to HTTP requests, and HTTP responses to REST responses.
 
+![REST client architecture](/img/rest-client.png)
+
 The `restClient` parameter of the `<Admin>` component, must be a function with the following signature:
 
 ```js
@@ -39,13 +41,24 @@ This REST client fits APIs using simple GET parameters for filters and sorting. 
 
 | REST verb      | API calls
 |----------------|----------------------------------------------------------------
-| `GET_LIST`     | `GET http://my.api.url/posts?sort=['title','ASC']&range=[0, 24]`
-| `GET_MATCHING` | `GET http://my.api.url/posts?filter={title:'bar'}`
+| `GET_LIST`     | `GET http://my.api.url/posts?sort=['title','ASC']&range=[0, 24]&filter={title:'bar'}`
 | `GET_ONE`      | `GET http://my.api.url/posts/123`
 | `GET_MANY`     | `GET http://my.api.url/posts?filter={ids:[123,456,789]}`
 | `UPDATE`       | `PUT http://my.api.url/posts/123`
 | `CREATE`       | `POST http://my.api.url/posts/123`
 | `DELETE`       | `DELETE http://my.api.url/posts/123`
+
+**Note**: The simple REST client expects the API to include a `Content-Range` header in the response to `GET_LIST` calls. The value must be the total number of resources in the collection. This allows admin-on-rest to know how many pages of resources there are in total, and build the pagination controls.
+
+```
+Content-Range: posts 0-24/319
+```
+
+If your API is on another domain as the JS code, you'll need to whitelist this header with an `Access-Control-Expose-Headers` [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS) header.
+
+```
+Access-Control-Expose-Headers: Content-Range
+```
 
 Here is how to use it in your admin:
 
@@ -72,13 +85,24 @@ This REST client fits APIs powered by [JSON Server](https://github.com/typicode/
 
 | REST verb      | API calls
 |----------------|----------------------------------------------------------------
-| `GET_LIST`     | `GET http://my.api.url/posts?_sort=title&_order=ASC&_start=0&_end=24`
-| `GET_MATCHING` | `GET http://my.api.url/posts?title=bar`
+| `GET_LIST`     | `GET http://my.api.url/posts?_sort=title&_order=ASC&_start=0&_end=24&title=bar`
 | `GET_ONE`      | `GET http://my.api.url/posts/123`
 | `GET_MANY`     | `GET http://my.api.url/posts/123, GET http://my.api.url/posts/456, GET http://my.api.url/posts/789`
 | `UPDATE`       | `PUT http://my.api.url/posts/123`
 | `CREATE`       | `POST http://my.api.url/posts/123`
 | `DELETE`       | `DELETE http://my.api.url/posts/123`
+
+**Note**: The jsonServer REST client expects the API to include a `X-Total-Count` header in the response to `GET_LIST` calls. The value must be the total number of resources in the collection. This allows admin-on-rest to know how many pages of resources there are in total, and build the pagination controls.
+
+```
+X-Total-Count: 319
+```
+
+If your API is on another domain as the JS code, you'll need to whitelist this header with an `Access-Control-Expose-Headers` [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS) header.
+
+```
+Access-Control-Expose-Headers: X-Total-Count
+```
 
 Here is how to use it in your admin:
 
@@ -141,6 +165,12 @@ const httpClient = (url, options) => {
 
 Now all the requests to the REST API will contain the `Authorization: SRTRDFVESGNJYTUKTYTHRG` header.
 
+### Third-Party Clients
+
+You can find REST clients for admin-on-rest in third-party repositories.
+
+* [marmelab/aor-json-rest-client](https://github.com/marmelab/aor-json-rest-client): a local REST client based on a JavaScript object. It doesn't even use HTTP. Use it for testing purposes.
+* [tomberek/aor-postgrest-client](https://github.com/tomberek/aor-postgrest-client): a REST client for [Postgrest](http://postgrest.com/en/v0.4/) client
 
 ## Writing your own REST client
 
@@ -163,7 +193,6 @@ Type | Params format
 `DELETE`             | `{ id: {mixed} }`
 `GET_MANY`           | `{ ids: {mixed[]} }`
 `GET_MANY_REFERENCE` | `{ target: {string}, id: {mixed} }`
-`GET_MATCHING`       | `{ filter: {Object} }`
 
 Examples:
 
@@ -178,7 +207,6 @@ restClient(UPDATE, 'posts', { id: 123, { title: "hello, world!" } });
 restClient(DELETE, 'posts', { id: 123 });
 restClient(GET_MANY, 'posts', { ids: [123, 124, 125] });
 restClient(GET_MANY_REFERENCE, 'comments', { target: 'post_id', id: 123 });
-restClient(GET_MATCHING, 'posts', { filter: { title: 'hello' } });
 ```
 
 ### Response Format
@@ -194,7 +222,6 @@ Type | Response format
 `DELETE`             | `{Record}`
 `GET_MANY`           | `{Record[]}`
 `GET_MANY_REFERENCE` | `{Record[]}`
-`GET_MATCHING`       | `{Record[]}`
 
 A `{Record}` is an object literal with at least an `id` property, e.g. `{ id: 123, title: "hello, world" }`.
 
@@ -254,12 +281,6 @@ restClient(GET_MANY_REFERENCE, 'comments', { target: 'post_id', id: 123 });
 // [
 //     { id: 667, title: "I agree", post_id: 123 },
 //     { id: 895, title: "I don't agree", post_id: 123 },
-// ]
-
-restClient(GET_MATCHING, 'posts', { filter: { title: 'hello' } })
-.then(record => console.log(record));
-// [
-//     { id: 123, title: "hello, world" },
 // ]
 ```
 

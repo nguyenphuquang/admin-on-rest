@@ -4,6 +4,7 @@ import { Link } from 'react-router';
 import LinearProgress from 'material-ui/LinearProgress';
 import get from 'lodash.get';
 import { crudGetOneReference as crudGetOneReferenceAction } from '../../actions/referenceActions';
+import linkToRecord from '../../util/linkToRecord'
 
 /**
  * @example
@@ -23,7 +24,7 @@ export class ReferenceField extends Component {
     }
 
     render() {
-        const { record, source, reference, referenceRecord, basePath, allowEmpty, children, style } = this.props;
+        const { record, source, reference, referenceRecord, basePath, allowEmpty, children, elStyle } = this.props;
         if (React.Children.count(children) !== 1) {
             throw new Error('<ReferenceField> only accepts a single child');
         }
@@ -32,7 +33,7 @@ export class ReferenceField extends Component {
         }
         const rootPath = basePath.split('/').slice(0, -1).join('/');
         return (
-            <Link style={style} to={`${rootPath}/${reference}/${get(record, source)}`}>
+            <Link style={elStyle} to={linkToRecord(`${rootPath}/${reference}`, get(record, source))}>
                 {React.cloneElement(children, {
                     record: referenceRecord,
                     resource: reference,
@@ -45,19 +46,21 @@ export class ReferenceField extends Component {
 }
 
 ReferenceField.propTypes = {
+    addLabel: PropTypes.bool,
     allowEmpty: PropTypes.bool.isRequired,
     basePath: PropTypes.string.isRequired,
     children: PropTypes.element.isRequired,
     crudGetOneReference: PropTypes.func.isRequired,
+    elStyle: PropTypes.object,
     label: PropTypes.string,
     record: PropTypes.object,
     reference: PropTypes.string.isRequired,
     referenceRecord: PropTypes.object,
     source: PropTypes.string.isRequired,
-    style: PropTypes.object,
 };
 
 ReferenceField.defaultProps = {
+    addLabel: true,
     referenceRecord: null,
     record: {},
     allowEmpty: false,

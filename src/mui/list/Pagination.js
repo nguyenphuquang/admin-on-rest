@@ -10,6 +10,7 @@ export class Pagination extends Component {
     range() {
         const input = [];
         const { page, perPage, total } = this.props;
+        if (isNaN(page)) return input;
         const nbPages = Math.ceil(total / perPage) || 1;
 
         // display page links around the current page
@@ -108,11 +109,10 @@ export class Pagination extends Component {
 }
 
 Pagination.propTypes = {
-    resource: PropTypes.string.isRequired,
     page: PropTypes.number,
     perPage: PropTypes.number,
     total: PropTypes.number,
-    setPage: PropTypes.func.isRequired,
+    setPage: PropTypes.func,
 };
 
 export default Pagination;

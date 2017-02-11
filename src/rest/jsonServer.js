@@ -1,7 +1,6 @@
 import { queryParameters, fetchJson } from '../util/fetch';
 import {
     GET_LIST,
-    GET_MATCHING,
     GET_ONE,
     GET_MANY,
     GET_MANY_REFERENCE,
@@ -16,7 +15,6 @@ import {
  * @see https://github.com/typicode/json-server
  * @example
  * GET_LIST     => GET http://my.api.url/posts?_sort=title&_order=ASC&_start=0&_end=24
- * GET_MATCHING => GET http://my.api.url/posts?title=bar
  * GET_ONE      => GET http://my.api.url/posts/123
  * GET_MANY     => GET http://my.api.url/posts/123, GET http://my.api.url/posts/456, GET http://my.api.url/posts/789
  * UPDATE       => PUT http://my.api.url/posts/123
@@ -42,13 +40,9 @@ export default (apiUrl, httpClient = fetchJson) => {
                 _sort: field,
                 _order: order,
                 _start: (page - 1) * perPage,
-                _end: page * perPage - 1,
+                _end: page * perPage,
             };
             url = `${apiUrl}/${resource}?${queryParameters(query)}`;
-            break;
-        }
-        case GET_MATCHING: {
-            url = `${apiUrl}/${resource}?${queryParameters(params.filter)}`;
             break;
         }
         case GET_ONE:
@@ -89,7 +83,7 @@ export default (apiUrl, httpClient = fetchJson) => {
         switch (type) {
         case GET_LIST:
             if (!headers.has('x-total-count')) {
-                throw new Error('The X-Total-Count header is missing in the HTTP Response. This header is necessary for pagination. If you are using CORS, did you declare X-Total-Count in the Access-Control-Allow-Headers header?');
+                throw new Error('The X-Total-Count header is missing in the HTTP Response. The jsonServer REST client expects responses for lists of resources to contain this header with the total number of results to build the pagination. If you are using CORS, did you declare X-Total-Count in the Access-Control-Expose-Headers header?');
             }
             return {
                 data: json.map(x => x),

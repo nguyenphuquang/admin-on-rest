@@ -2,32 +2,32 @@ import React, { PropTypes } from 'react';
 import TextField from 'material-ui/TextField';
 import title from '../../util/title';
 
-const LongTextInput = ({ input, label, meta: { touched, error }, options, source, style }) => (
+const LongTextInput = ({ input, label, meta: { touched, error }, options, source, elStyle }) => (
     <TextField
         {...input}
         multiLine
         fullWidth
         floatingLabelText={title(label, source)}
         errorText={touched && error}
-        style={style}
+        style={elStyle}
         {...options}
     />
 );
 
 LongTextInput.propTypes = {
-    includesLabel: PropTypes.bool.isRequired,
+    addField: PropTypes.bool.isRequired,
+    elStyle: PropTypes.object,
     input: PropTypes.object,
     label: PropTypes.string,
     meta: PropTypes.object,
     name: PropTypes.string,
     options: PropTypes.object,
-    source: PropTypes.string.isRequired,
-    style: PropTypes.object,
+    source: PropTypes.string,
     validation: PropTypes.object,
 };
 
 LongTextInput.defaultProps = {
-    includesLabel: true,
+    addField: true,
     options: {},
 };
 

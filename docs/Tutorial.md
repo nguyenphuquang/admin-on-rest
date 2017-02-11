@@ -9,14 +9,14 @@ This 15 minutes tutorial will expose how to create a new admin app based on an e
 
 ## Installation
 
-Admin-on-REST uses React. We'll use Facebook's [react-create-app](https://github.com/facebookincubator/create-react-app) to create an empty React app, and install the `admin-on-rest` npm package:
+Admin-on-REST uses React. We'll use Facebook's [react-create-app](https://github.com/facebookincubator/create-react-app) to create an empty React app, and install the `admin-on-rest` package:
 
 ```sh
 npm install -g create-react-app
 create-react-app test-admin
 cd test-admin/
-npm install --save-dev admin-on-rest
-npm start
+yarnpkg add admin-on-rest
+yarnpkg start
 ```
 
 You should be up and running with an empty React application on port 3000.
@@ -184,7 +184,7 @@ An admin interface is usually for more than seeing remote data - it's for editin
 ```js
 // in src/posts.js
 import React from 'react';
-import { List, Edit, Create, Datagrid, ReferenceField, TextField, EditButton, DisabledInput, LongTextInput, ReferenceInput, SelectInput, TextInput } from 'admin-on-rest/lib/mui';
+import { List, Edit, Create, Datagrid, ReferenceField, TextField, EditButton, DisabledInput, LongTextInput, ReferenceInput, SelectInput, SimpleForm, TextInput } from 'admin-on-rest/lib/mui';
 
 export const PostList = (props) => (
     <List {...props}>
@@ -205,30 +205,34 @@ const PostTitle = ({ record }) => {
 };
 
 export const PostEdit = (props) => (
-    <Edit title={PostTitle} {...props}>
-        <DisabledInput source="id" />
-        <ReferenceInput label="User" source="userId" reference="users">
-            <SelectInput optionText="name" />
-        </ReferenceInput>
-        <TextInput source="title" />
-        <LongTextInput source="body" />
+    <Edit title={<PostTitle />} {...props}>
+        <SimpleForm>
+            <DisabledInput source="id" />
+            <ReferenceInput label="User" source="userId" reference="users">
+                <SelectInput optionText="name" />
+            </ReferenceInput>
+            <TextInput source="title" />
+            <LongTextInput source="body" />
+        </SimpleForm>
     </Edit>
 );
 
 export const PostCreate = (props) => (
     <Create {...props}>
-        <ReferenceInput label="User" source="userId" reference="users" allowEmpty>
-            <SelectInput optionText="name" />
-        </ReferenceInput>
-        <TextInput source="title" />
-        <LongTextInput source="body" />
+        <SimpleForm>
+            <ReferenceInput label="User" source="userId" reference="users" allowEmpty>
+                <SelectInput optionText="name" />
+            </ReferenceInput>
+            <TextInput source="title" />
+            <LongTextInput source="body" />
+        </SimpleForm>
     </Create>
 );
 ```
 
 Notice the additional `<EditButton>` field in the `<PostList>` component children: that's what gives access to the post edition view. Also, the `<Edit>` component uses a custom `<PostTitle>` component as title, which shows the way to customize the title of a given view.
 
-Just like the `<List>` component expects *field components* as children, the `<Edit>` and `<Create>` components expect *input components* as children. `<DisabledInput>`, `<TextInput>`, `<LongTextInput>`, and `<ReferenceInput>` are such inputs.
+If you've understood the `<List>` component, the `<Edit>` and `<Create>` components will be no surprise. They are responsible for displaying the page title and preparing the data (fetching and setting default values). They pass the data to the `<SimpleForm>` component, which is responsible for the form layout and validation. Just like `<Datagrid>`, `<SimpleForm>` uses its children to display the form inputs. It expects *input components* as children. `<DisabledInput>`, `<TextInput>`, `<LongTextInput>`, and `<ReferenceInput>` are such inputs.
 
 As for the `<ReferenceInput>`, it takes the same attributes as the `<ReferenceField>` (used earlier in the list view). `<ReferenceInput>` uses these attributes to fetch the API for possible references for the current record (in this case, possible `users` for the current `post`). Once it gets these possible records, it passes them to the child component (`<SelectInput>`), which is responsible for displaying them (via their `name` in that case) and letting the user select one. `<SelectInput>` renders as a `<select>` tag in HTML.
 
@@ -283,7 +287,7 @@ In the edition view, a new "delete" button appears. And you can also use the `<D
 
 Let's get back to the post list for a minute. It offers sorting and pagination, but one feature is missing: the ability to search content.
 
-Admin-on-rest can use input components to create a multi-criteria search engine in the list view. First, create a `<Filter>` component just like you would with a `<Create>` component, using input components. Then, tell the list to use this filter component using the `filter` attribute:
+Admin-on-rest can use input components to create a multi-criteria search engine in the list view. First, create a `<Filter>` component just like you would with a `<Create>` component, using input components. Then, tell the list to use a filter element using the `filter` prop:
 
 ```js
 // in src/posts.js
@@ -299,7 +303,7 @@ const PostFilter = (props) => (
 );
 
 export const PostList = (props) => (
-    <List {...props} filter={PostFilter}>
+    <List {...props} filter={<PostFilter />}>
         // ...
     </List>
 );
@@ -379,7 +383,7 @@ For instance, let's imagine you have to use the my.api.url API, which expects th
 | Create a record     | `POST http://my.api.url/posts/123` |
 | Delete a record     | `DELETE http://my.api.url/posts/123` |
 
-Admin-on-rest defines custom verbs for each of the actions of this list. Just like HTTP verbs (`GET`, `POST`, etc.), REST verbs qualify a request to a REST server. Admin-on-rest verbs are called `GET_LIST`, `GET_MATCHING`, `GET_ONE`, `GET_MANY`, `CREATE`, `UPDATE`, and `DELETE`. The REST client will have to map each of these verbs to one (or many) HTTP request(s).
+Admin-on-rest defines custom verbs for each of the actions of this list. Just like HTTP verbs (`GET`, `POST`, etc.), REST verbs qualify a request to a REST server. Admin-on-rest verbs are called `GET_LIST`, `GET_ONE`, `GET_MANY`, `CREATE`, `UPDATE`, and `DELETE`. The REST client will have to map each of these verbs to one (or many) HTTP request(s).
 
 The code for an API client for my.api.url is as follows:
 
@@ -387,7 +391,6 @@ The code for an API client for my.api.url is as follows:
 // in src/restClient
 import {
     GET_LIST,
-    GET_MATCHING,
     GET_ONE,
     GET_MANY,
     CREATE,
@@ -415,13 +418,6 @@ const convertRESTRequestToHTTP = (type, resource, params) => {
         const query = {
             sort: JSON.stringify([field, order]),
             range: JSON.stringify([(page - 1) * perPage, page * perPage - 1]),
-            filter: JSON.stringify(params.filter),
-        };
-        url = `${API_URL}/${resource}?${queryParameters(query)}`;
-        break;
-    }
-    case GET_MATCHING: {
-        const query = {
             filter: JSON.stringify(params.filter),
         };
         url = `${API_URL}/${resource}?${queryParameters(query)}`;
