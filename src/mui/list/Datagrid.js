@@ -87,7 +87,9 @@ class Datagrid extends Component {
                             <DatagridHeaderCell
                                 key={field.props.source || index}
                                 field={field}
-                                defaultStyle={index === 0 ? styles.header['th:first-child'] : styles.header.th}
+                                defaultStyle={
+                                    Object.assign({}, index === 0 ? styles.header['th:first-child'] : styles.header.th, {textAlign: field.props.align || 'left'})
+                                }
                                 currentSort={currentSort}
                                 updateSort={this.updateSort}
                             />
@@ -101,7 +103,9 @@ class Datagrid extends Component {
                                 <DatagridCell
                                     key={`${id}-${field.props.source || index}`}
                                     record={data[id]}
-                                    defaultStyle={index === 0 ? styles.cell['td:first-child'] : styles.cell.td}
+                                    defaultStyle={
+                                        Object.assign({}, index === 0 ? styles.cell['td:first-child'] : styles.cell.td, {textAlign: field.props.align || 'left'})
+                                    }
                                     {...{ field, basePath, resource }}
                                 />
                             ))}
