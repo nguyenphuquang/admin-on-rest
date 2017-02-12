@@ -6,6 +6,7 @@ import { SaveButton } from '../button';
 import Labeled from '../input/Labeled';
 import get from 'lodash.get';
 import set from 'lodash.set';
+import FormField from '../form/FormField';
 
 /**
  * @example
@@ -31,32 +32,33 @@ const getFieldConstraints = (children) => React.Children.toArray(children)
         return constraints;
     }, {});
 
-export const validateForm = (values, { children, validation }) => {
-    const errors = typeof validation === 'function' ? validation(values) : {};
-
-    // warn user we expect an object here, in case of validation just returned an error message
-    if (errors === null || typeof errors !== 'object') {
-        throw new Error('Validation function given to form components should return an object.');
-    }
-
-    const fieldConstraints = getFieldConstraints(children);
-    Object.keys(fieldConstraints).forEach(fieldName => {
-        const error = fieldConstraints[fieldName](get(values, fieldName), values);
-        if (error.length > 0) {
-            /*
-            if (!errors[fieldName]) {
-                errors[fieldName] = [];
-            }
-            errors[fieldName] = [...errors[fieldName], ...error];
-            */
-            if (!get(errors, fieldName)) {
-                set(errors, fieldName, []);
-            }
-            set(errors, fieldName, [...get(errors, fieldName), ...error]);
-        }
-    });
-    return errors;
-};
+import { validateForm } from '../../util/validate';
+// export const validateForm = (values, { children, validation }) => {
+//     const errors = typeof validation === 'function' ? validation(values) : {};
+//
+//     // warn user we expect an object here, in case of validation just returned an error message
+//     if (errors === null || typeof errors !== 'object') {
+//         throw new Error('Validation function given to form components should return an object.');
+//     }
+//
+//     const fieldConstraints = getFieldConstraints(children);
+//     Object.keys(fieldConstraints).forEach(fieldName => {
+//         const error = fieldConstraints[fieldName](get(values, fieldName), values);
+//         if (error.length > 0) {
+//             /*
+//             if (!errors[fieldName]) {
+//                 errors[fieldName] = [];
+//             }
+//             errors[fieldName] = [...errors[fieldName], ...error];
+//             */
+//             if (!get(errors, fieldName)) {
+//                 set(errors, fieldName, []);
+//             }
+//             set(errors, fieldName, [...get(errors, fieldName), ...error]);
+//         }
+//     });
+//     return errors;
+// };
 
 export const RecordForm = ({ children, handleSubmit, record, resource, basePath, buttons=[<SaveButton key="save" />], content=null }) => (
     <form onSubmit={handleSubmit}>
@@ -64,26 +66,7 @@ export const RecordForm = ({ children, handleSubmit, record, resource, basePath,
         <div style={{ padding: '0 1em 1em 1em' }}>
             {React.Children.map(children, input => (
                 <div key={input.props.source}>
-                    { input.props.includesLabel ?
-                        <Field
-                            {...input.props}
-                            name={input.props.source}
-                            component={input.type}
-                            resource={resource}
-                            record={record}
-                            basePath={basePath}
-                            />
-                        :
-                        <Field
-                            {...input.props}
-                            name={input.props.source}
-                            component={Labeled}
-                            label={input.props.label}
-                            resource={resource}
-                            record={record}
-                            basePath={basePath}
-                            >{ input }</Field>
-                    }
+                    <FormField input={input} resource={resource} record={record} basePath={basePath} />
                 </div>
             ))}
         </div>
@@ -103,7 +86,12 @@ RecordForm.propTypes = {
     basePath: PropTypes.string,
 };
 
-export default (formName) => reduxForm({
-    form: 'record-form-' + formName,
-    validate: validateForm,
-})(RecordForm);
+export default (formName) => {
+    formName = 'record-form-' + formName;
+    var ret = reduxForm({
+        form: formName,
+        validate: validateForm,
+    })(RecordForm);
+    ret.formName = formName;
+    return ret;
+}

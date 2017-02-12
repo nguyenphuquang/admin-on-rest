@@ -8,6 +8,10 @@ export default (previousState = false, { type }) => {
         return true;
     case LOCATION_CHANGE:
     case actionTypes.SET_SUBMIT_FAILED:
+
+    // quang's call stop submit manually
+    case actionTypes.STOP_SUBMIT:
+
     case CRUD_CREATE_FAILURE:
     case CRUD_UPDATE_FAILURE:
         return false;
