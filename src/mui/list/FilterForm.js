@@ -27,7 +27,7 @@ export class FilterForm extends Component {
                 displayedFilters[filterElement.props.source] ||
                 currentFilters[filterElement.props.source] ||
                 typeof initialValues[filterElement.props.source] !== 'undefined'
-            );
+            ));
     }
 
     handleHide = (event) => this.props.hideFilter(event.currentTarget.dataset.key);
