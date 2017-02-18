@@ -60,7 +60,7 @@ export class List extends Component {
     constructor(props) {
         super(props);
         this.debouncedSetFilters = debounce(this.setFilters.bind(this), 500);
-        this.state = {};
+        this.state = {key: 0};
     }
 
     componentDidMount() {
@@ -114,6 +114,7 @@ export class List extends Component {
 
     refresh = (event) => {
         event.stopPropagation();
+        this.fullRefresh = true;
         this.updateData();
     }
 
@@ -184,7 +185,7 @@ export class List extends Component {
         const defaultTitle = translate('aor.page.list', { name: `${resourceName}` });
 
         return (
-            <Card style={{ margin: '2em', opacity: isLoading ? 0.8 : 1 }}>
+            <Card style={{ margin: '2em', opacity: isLoading ? 0.8 : 1 }} key={key}>
                 {actions && React.cloneElement(actions, {
                     resource,
                     filters,
@@ -205,15 +206,15 @@ export class List extends Component {
                     context: 'form',
                 })}
                 <div style={{overflowX: 'scroll', width: '100%'}}>
-                {React.cloneElement(children, {
-                    resource,
-                    ids,
-                    data,
-                    currentSort: { field: query.sort, order: query.order },
-                    basePath,
-                    isLoading,
-                    setSort: this.setSort,
-                })}
+                    {React.cloneElement(children, {
+                        resource,
+                        ids,
+                        data,
+                        currentSort: { field: query.sort, order: query.order },
+                        basePath,
+                        isLoading,
+                        setSort: this.setSort,
+                    })}
                 </div>
                 {pagination && React.cloneElement(pagination, {
                     total,

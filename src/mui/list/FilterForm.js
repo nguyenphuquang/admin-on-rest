@@ -20,12 +20,13 @@ const emptyRecord = {};
 
 export class FilterForm extends Component {
     getShownFilters() {
-        const { filters, displayedFilters, initialValues } = this.props;
+        const { filters, displayedFilters, initialValues, currentFilters } = this.props;
         return filters
             .filter(filterElement => (
                 filterElement.props.alwaysOn ||
                 displayedFilters[filterElement.props.source] ||
                 currentFilters[filterElement.props.source] ||
+                initialValues[filterElement.props.source] ||
                 typeof initialValues[filterElement.props.source] !== 'undefined'
             ));
     }
@@ -51,7 +52,7 @@ export class FilterForm extends Component {
                                 name={filterElement.props.source}
                                 component={filterElement.type}
                                 resource={resource}
-                                record={emptyRecord}
+                                record={currentFilters}
                             />
                         </div>
                     </div>
@@ -64,11 +65,16 @@ export class FilterForm extends Component {
 
 FilterForm.propTypes = {
     resource: PropTypes.string.isRequired,
+    currentFilters: PropTypes.object.isRequired,
     filters: PropTypes.arrayOf(PropTypes.node).isRequired,
     displayedFilters: PropTypes.object.isRequired,
     hideFilter: PropTypes.func.isRequired,
     initialValues: PropTypes.object,
     translate: PropTypes.func.isRequired,
+};
+
+FilterForm.defaultProps = {
+    currentFilters: {},
 };
 
 const enhance = compose(
