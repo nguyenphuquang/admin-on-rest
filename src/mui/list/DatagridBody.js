@@ -10,7 +10,9 @@ const DatagridBody = ({ resource, children, ids, data, basePath, styles, rowStyl
                     <DatagridCell
                         key={`${id}-${field.props.source || index}`}
                         record={data[id]}
-                        defaultStyle={index === 0 ? styles.cell['td:first-child'] : styles.cell.td}
+                        defaultStyle={
+                            Object.assign({}, index === 0 ? styles.cell['td:first-child'] : styles.cell.td, {textAlign: field.props.align || 'left'})
+                        }
                         {...{ field, basePath, resource }}
                     />
                 ))}
