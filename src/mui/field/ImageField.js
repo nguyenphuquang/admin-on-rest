@@ -12,8 +12,8 @@ const styles = {
 };
 
 export const ImageField = ({ elStyle = {}, record, source, title }) => {
-    const style = {
-        ...styles.container,
+    const _styles = {
+        ...styles,
         ...elStyle,
     };
 
@@ -24,12 +24,12 @@ export const ImageField = ({ elStyle = {}, record, source, title }) => {
     }
 
     return (
-        <div style={style}>
+        <div style={_styles.container}>
             <img
                 title={titleValue}
                 alt={titleValue}
                 src={srcValue}
-                style={styles.image}
+                style={_styles.image}
             />
         </div>
     );

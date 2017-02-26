@@ -305,7 +305,7 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
     return Object.assign({}, ownProps, stateProps, dispatchProps);
 }
 
-export default translate(connect(
+export default connect(
     mapStateToProps,
     {
         crudGetList: crudGetListAction,
@@ -314,4 +314,4 @@ export default translate(connect(
         push: pushAction,
     },
     mergeProps
-)(List));
+)(translate(List));
