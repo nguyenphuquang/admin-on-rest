@@ -41,7 +41,7 @@ SimpleForm.propTypes = {
 const ReduxForm = reduxForm({
     form: 'record-form',
     validate: validateForm,
-    enableReinitialize: true,
+    // enableReinitialize: true,
 })(SimpleForm);
 
 const mapStateToProps = (state, props) => ({

@@ -37,7 +37,7 @@ export class FilterForm extends Component {
         const { currentFilters, resource, translate } = this.props;
         return (<div>
             <CardText style={styles.card}>
-                {this.getShownFilters().reverse().map(filterElement =>
+                {this.getShownFilters().map(filterElement =>
                     <div key={filterElement.props.source} style={filterElement.props.style || styles.body}>
                         {filterElement.props.alwaysOn ?
                             <div style={styles.spacer}>&nbsp;</div> :
