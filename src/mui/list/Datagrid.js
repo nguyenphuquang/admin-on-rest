@@ -69,11 +69,12 @@ class Datagrid extends Component {
 
     render() {
         const { resource, children, ids, isLoading, data, currentSort, basePath, styles = defaultStyles, muiTheme, rowStyle } = this.props;
+        const _children = children.filter(item => item);
         return (
             <table style={muiTheme.table}>
                 <thead>
                     <tr style={muiTheme.tableRow}>
-                        {React.Children.map(children, (field, index) => (
+                        {React.Children.map(_children, (field, index) => (
                             <DatagridHeaderCell
                                 key={field.props.source || index}
                                 field={field}
@@ -89,7 +90,7 @@ class Datagrid extends Component {
                     </tr>
                 </thead>
                 <DatagridBody resource={resource} ids={ids} data={data} basePath={basePath} styles={styles} rowStyle={rowStyle} isLoading={isLoading}>
-                    {children}
+                    {_children}
                 </DatagridBody>
             </table>
         );

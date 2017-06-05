@@ -81,11 +81,12 @@ const ChildDatagrid = withRouter(
             }
         }
 
-        onClick(item, id) {
+        onClick(item, id, editTitle) {
             this.setState({
                 _currentRecord: item,
                 _currentId: id,
                 open: true,
+                editTitle,
             });
         }
 
@@ -138,7 +139,8 @@ const ChildDatagrid = withRouter(
                                     </TableHeaderColumn>
                                 ))}
                                 {canAdd && <TableRowColumn key={`add--1`} style={styles.td} >
-                                    <FlatButton primary label="Add" onClick={this.onClick.bind(this, {}, null)} />
+                                    <FlatButton primary label="Add"
+                                        onClick={this.onClick.bind(this, this.props.defaultRecord?(this.props.defaultRecord()):{}, null, 'Add new record')} />
                                 </TableRowColumn>}
                             </tr>
                         </thead>
@@ -151,7 +153,7 @@ const ChildDatagrid = withRouter(
                                         </TableRowColumn>
                                     })}
                                     <TableRowColumn key={`${id}--1`} style={styles.td} >
-                                        {canEdit && <FlatButton primary label="Edit" onClick={this.onClick.bind(this, row, id)} />}
+                                        {canEdit && <FlatButton primary label="Edit" onClick={this.onClick.bind(this, row, id, 'Edit record')} />}
                                         {canDelete && <FlatButton primary label="Delete" onClick={this.onDelete.bind(this, row, id)} />}
                                     </TableRowColumn>
                                 </tr>
@@ -159,7 +161,7 @@ const ChildDatagrid = withRouter(
                         </tbody>
                     </table>
                     {this.state.open?(
-                        <Dialog open={this.state.open} title="Edit record"
+                        <Dialog open={this.state.open} title={this.state.editTitle}
                                 onRequestClose={() => {this.setState({open: false})}} >
                             <this.ChildRecordForm
                                 onSubmit={this.onSave.bind(this)}

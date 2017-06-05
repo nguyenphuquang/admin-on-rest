@@ -138,6 +138,12 @@ export class List extends Component {
 
     updateData(query) {
         const params = query || this.getQuery();
+
+        // check for dont duplicate request
+        const jsonParams = JSON.stringify(params);
+        if (jsonParams == this.lastQuery) return;
+        this.lastQuery = jsonParams;
+        
         const { sort, order, page, perPage, filter } = params;
         const permanentFilter = this.props.filter;
         this.props.crudGetList(this.props.resource, { page, perPage }, { field: sort, order }, { ...filter, ...permanentFilter });

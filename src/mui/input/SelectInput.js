@@ -66,7 +66,8 @@ class SelectInput extends Component {
             );
         if (!allowEmpty) {
             if (choices && choices.length > 0 && (input.value==='' || typeof input.value === 'undefined')) {
-                input.value = choices[0][optionValue];
+                input.value = choices[0][optionValue]
+                input.onChange(choices[0][optionValue]);
             }
         }
 
